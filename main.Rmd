@@ -1,0 +1,89 @@
+---
+title: "Shiny Draft"
+author: "Aviyan"
+date: "6/1/2022"
+output: html_document
+runtime: shiny
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+ 
+
+```{r eruptions, echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(ggplot2)
+library(ggplot2movies)
+
+action1 <- movies$Action
+act_pos <- which(action1 %in% c(1))
+actiondf <- data.frame(m_rate=movies$rating[act_pos], year=movies$year[act_pos])
+actiondf1 <- actiondf %>% group_by(year) %>% summarise(action_rate = mean(m_rate))
+actiondf1 <- filter(actiondf1, year>1930)
+actiondf1 <- mutate(actiondf1,genre=rep("action", dim(actiondf1)[1])) 
+
+
+
+d1 <- movies$Drama
+dpos <- which(d1 %in% c(1))
+drama_df <- data.frame(m_rate=movies$rating[dpos], year=movies$year[dpos])
+drama_df1 <- drama_df %>% group_by(year) %>% summarise(drama_rate = mean(m_rate))
+drama_df1 <- filter(drama_df1, year>1930)
+drama_df1 <- mutate(drama_df1,genre=rep("drama", dim(drama_df1)[1])) 
+
+
+d4 <- movies$Comedy
+copos <- which(d4 %in% c(1))
+co_df <- data.frame(m_rate=movies$rating[copos], year=movies$year[copos])
+co_df1 <- co_df %>% group_by(year) %>% summarise(comedy_rate = mean(m_rate))
+co_df1 <- filter(co_df1, year>1930)
+co_df1 <- mutate(co_df1,genre=rep("comedy", dim(co_df1)[1])) 
+
+
+
+d6 <- movies$Romance
+ropos <- which(d6 %in% c(1))
+ro_df <- data.frame(m_rate=movies$rating[ropos], year=movies$year[ropos])
+ro_df1 <- ro_df %>% group_by(year) %>% summarise(rom_rate = mean(m_rate))
+ro_df1 <- filter(ro_df1,year>1930)
+ro_df1 <- mutate(ro_df1,genre=rep("romance", dim(ro_df1)[1])) 
+
+colnames(actiondf1)[2] <- c("rating")
+colnames(drama_df1)[2] <- c("rating")
+colnames(co_df1)[2] <- c("rating")
+colnames(ro_df1)[2] <- c("rating")
+
+
+mov_ratings <- rbind(actiondf1, drama_df1,co_df1, ro_df1)
+
+
+
+
+
+
+
+```
+
+
+
+
+
+
+
+```{r}
+inputPanel(
+   sliderInput("Years", label = "Year",
+              min = 1930, max = 2005, value = 1931, step = 1, width = "1000px")
+)
+
+renderPlot({
+  ggplot(data=subset(mov_ratings, year==as.numeric(input$Years)) , aes(x=genre, y=rating, color=genre)) + 
+    geom_point(size=10) +
+    labs(x = "Ratings", title = "Avg movie ratings from 1931 to 2005")
+    
+  })
+```
+
+
+
